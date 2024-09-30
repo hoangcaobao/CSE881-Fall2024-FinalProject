@@ -76,7 +76,7 @@ def download_images(image_urls, folder_path, time_sleep = 2):
 
 labels = ["Stop Sign", "Yield Sign", "Speed Limit Sign", "Pedestrian Crossing Sign", "No Entry Sign"]
 for label in labels:
-    max_images = 20
+    max_images = 30
     image_urls = get_image_urls(label, max_images)
     download_images(image_urls, f"./images/{label}")
 
