@@ -5,6 +5,7 @@ import requests
 import time
 import os
 import base64
+from PIL import Image
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -24,6 +25,18 @@ def download_image(url, file_path):
     response = requests.get(url)
     with open(file_path, "wb") as f:
         f.write(response.content)
+
+def check_image_quality(file_path, min_width, min_height):
+    try:
+        with Image.open(file_path) as img:
+            width, height = img.size
+            if width < min_width or height < min_height:
+                os.remove(file_path)  # Remove if below threshold
+                print(f"Removed {file_path} due to insufficient quality.")
+    except Exception as e:
+        print(f"Failed to check quality of {file_path} due to {e}")
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
 def get_image_urls(query, number_of_links, sleep_time=2):
 
@@ -60,7 +73,7 @@ def get_image_urls(query, number_of_links, sleep_time=2):
 
     return image_urls
 
-def download_images(image_urls, folder_path, time_sleep = 2):
+def download_images(image_urls, folder_path, min_height, min_width, time_sleep = 2):
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
 
@@ -71,14 +84,19 @@ def download_images(image_urls, folder_path, time_sleep = 2):
                 download_image(img_url, os.path.join(folder_path, f"{i+1}.jpg"))
             elif "base64" in img_url:
                 base64_to_image(img_url, os.path.join(folder_path, f"{i+1}.jpg"))
+            check_image_quality(os.path.join(folder_path, f"{i+1}.jpg"), min_width, min_height)
+
         except Exception as e:
             print(f"Failed to download image {i+1} due to {e}")
 
 labels = ["Stop Sign", "Yield Sign", "Speed Limit Sign", "Pedestrian Crossing Sign", "No Entry Sign"]
+max_images = 100
+min_height = 100
+min_width = 100
+
 for label in labels:
-    max_images = 30
     image_urls = get_image_urls(label, max_images)
-    download_images(image_urls, f"./images/{label}")
+    download_images(image_urls, f"./images/{label}", min_height=min_height, min_width=min_width)
 
 # Close the browser session
 driver.quit()
