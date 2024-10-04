@@ -46,7 +46,10 @@ def get_image_urls(query, number_of_links, sleep_time=2):
     driver.get(search_url)
     image_urls = set()
 
-    while len(image_urls) < number_of_links:
+    iteration = 0
+    
+    while len(image_urls) < number_of_links and iteration < 10:
+        iteration += 1
         time.sleep(sleep_time)
         soup = BeautifulSoup(driver.page_source, "html.parser")
 
@@ -65,7 +68,7 @@ def get_image_urls(query, number_of_links, sleep_time=2):
             if (img_height and int(img_height) <= 20) or (img_width and int(img_width) <= 20):
                 continue
             
-            if img_url:
+            if img_url and img_url not in image_urls:
                 image_urls.add(img_url)
 
         # Scroll the page
@@ -90,7 +93,7 @@ def download_images(image_urls, folder_path, min_height, min_width, time_sleep =
             print(f"Failed to download image {i+1} due to {e}")
 
 labels = ["Stop Sign", "Yield Sign", "Speed Limit Sign", "Pedestrian Crossing Sign", "No Entry Sign"]
-max_images = 100
+max_images = 2000
 min_height = 100
 min_width = 100
 
