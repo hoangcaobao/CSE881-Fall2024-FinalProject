@@ -48,7 +48,7 @@ def get_image_urls(query, number_of_links, sleep_time=2):
 
     iteration = 0
     
-    while len(image_urls) < number_of_links and iteration < 10:
+    while len(image_urls) < number_of_links and iteration < 20:
         iteration += 1
         time.sleep(sleep_time)
         soup = BeautifulSoup(driver.page_source, "html.parser")
