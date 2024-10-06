@@ -18,7 +18,7 @@ def add_images_from_scraped_images(scraped_path, dataset_path):
         os.makedirs(dataset_path)
 
     for img_dir in os.listdir(scraped_path):
-        label = img_dir.lower()
+        label = "".join(img_dir.lower().split(" ")[:-1])
         label_directory = os.path.join(scraped_path, img_dir)
         for img_path in os.listdir(label_directory):
             ids = len(image_metadata)
@@ -71,7 +71,7 @@ def merge_kaggle_images(kaggle_path, dataset_path, image_metadata):
 
         img = cv2.imread(os.path.join(image_folder, img_name))
         img = resize(img)
-        cv2.imwrite(f"{dataset_directory}/{new_img_name}.png", img)
+        cv2.imwrite(f"{dataset_path}/{new_img_name}.png", img)
 
     return metadata
 
@@ -89,9 +89,10 @@ if __name__ == '__main__':
 
     # Create metadata.csv
 
-    df = pd.DataFrame.from_dict(metadata, orient="index")
-    df.to_csv(os.path.join(dataset_directory, "metadata.csv"), index=False)
-    train_data, test_data = train_test_split(metadata, test_size=0.2, random_state=881, stratify=metadata["label"])
+    metadata = pd.DataFrame.from_dict(metadata, orient="index")
+    metadata.to_csv(os.path.join(dataset_directory, "metadata.csv"), index=False)
+    train_data, test_data = train_test_split(metadata, test_size=0.2, random_state=881,
+                                             stratify=metadata["label"])
 
     train_data.to_csv(os.path.join(dataset_directory, "metadata_train.csv"), index=False)
     test_data.to_csv(os.path.join(dataset_directory, "metadata_test.csv"), index=False)

@@ -4,3 +4,5 @@ transformers
 numpy
 scikit-learn
 pandas
+torchvision
+tqdm
