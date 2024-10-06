@@ -5,6 +5,8 @@ __pycache__/
 
 images
 
+dataset
+
 # C extensions
 *.so
 

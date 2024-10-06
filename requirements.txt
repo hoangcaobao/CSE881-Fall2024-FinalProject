@@ -1,0 +1,6 @@
+opencv-python>=4.10.0
+torch
+transformers
+numpy
+scikit-learn
+pandas
