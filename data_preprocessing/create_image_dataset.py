@@ -3,6 +3,7 @@ import cv2
 import xml.etree.ElementTree as ET
 import copy
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
 
 def resize(img, size=(256, 256)):
@@ -90,3 +91,7 @@ if __name__ == '__main__':
 
     df = pd.DataFrame.from_dict(metadata, orient="index")
     df.to_csv(os.path.join(dataset_directory, "metadata.csv"), index=False)
+    train_data, test_data = train_test_split(metadata, test_size=0.2, random_state=881, stratify=metadata["label"])
+
+    train_data.to_csv(os.path.join(dataset_directory, "metadata_train.csv"), index=False)
+    test_data.to_csv(os.path.join(dataset_directory, "metadata_test.csv"), index=False)
