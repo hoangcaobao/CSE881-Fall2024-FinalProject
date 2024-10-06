@@ -83,8 +83,8 @@ if __name__ == '__main__':
     dataset_directory = "../dataset/"
     dataset_img_dir = os.path.join(dataset_directory, "images")
 
-    metadata = add_images_from_scraped_images(scraped_images_directories, dataset_directory)
-    metadata = merge_kaggle_images(kaggle_path, dataset_directory, metadata)
+    metadata = add_images_from_scraped_images(scraped_images_directories, dataset_img_dir)
+    metadata = merge_kaggle_images(kaggle_path, dataset_img_dir, metadata)
 
     # Create metadata.csv
 
