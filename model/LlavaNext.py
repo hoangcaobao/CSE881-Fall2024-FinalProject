@@ -37,7 +37,7 @@ class LlavaNext():
         output = self.model.generate(**inputs, max_new_tokens=self.max_new_token, temperature=self.temperature)
 
         text = self.processor.decode(output[0], skip_special_tokens=True)
-        keyword = "Answer:" # Expected this format from the model
+        keyword = "assistant" # Expected this format from the model
         output = text[text.rfind(keyword) + len(keyword): ].strip()
         return output
         

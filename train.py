@@ -14,15 +14,17 @@ from sklearn.metrics import accuracy_score
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # gpu, mps
-    parser.add_argument("--device", type=str, default="gpu", required=False)
+    parser.add_argument("--device", type=str, default="0", required=False)
     parser.add_argument("--seed", type=int, default = 42, required=False)
     
     # CNN, VGG
-    parser.add_argument("--model", type = str, default="VGG", required=False)
+    parser.add_argument("--model", type = str, default="RESNET", required=False)
 
     args = parser.parse_args()
     train_dataset = RoadSignDataset("dataset/metadata_train.csv")
     test_dataset = RoadSignDataset("dataset/metadata_test.csv")
+
+    torch.manual_seed(args.seed)
 
     num_features = len(train_dataset.index_label)
 
@@ -31,14 +33,17 @@ if __name__ == "__main__":
 
     if args.device == "mps":
         device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-    if args.device == "gpu":
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    else:
+        device = torch.device(f"cuda:{args.device}" if torch.cuda.is_available() else "cpu")
 
-    if args.model == "CNN":
-        model = SimpleCNN(num_classes=7).to(device)
-    elif args.model == "VGG":
-        model = models.vgg16(pretrained=True)
+    if args.model == "VGG":
+        model = models.vgg16(weights=True)
         model.classifier[6] = nn.Linear(4096, 7) 
+    elif args.model == "RESNET":
+        model = models.resnet50(weights=True)
+        model.fc = nn.Linear(model.fc.in_features, 7)
+    else:
+        model = SimpleCNN(num_classes=7)
     
     model = model.to(device)
     loss_fn = nn.CrossEntropyLoss()
