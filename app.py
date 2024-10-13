@@ -7,6 +7,11 @@ import torchvision.transforms as transforms
 import numpy as np
 
 st.title("Road Sign Detection Project")
+option = st.selectbox(
+    "Which Computer Vision Architectures you want to use?",
+    ("VGG", "ResNet"),
+)
+
 uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 label_mapping = {0: 'Cross Walk', 1: 'No Entry', 2: 'Pedestrian Crossing', 3: 'Speed Limit', 4: 'Stop', 5: 'Traffic Light', 6: 'Yield'}
 
@@ -22,7 +27,13 @@ if uploaded_image is not None:
     st.image(image, caption="Uploaded Image", use_column_width=True)
     
     # Load the model
-    model = torch.load("weights/VGG.pt", map_location=torch.device("cpu"))
+    if option == "VGG":
+        model = torch.load("weights/VGG.pt", map_location=torch.device("cpu"))
+    elif option == "ResNet":
+        model = torch.load("weights/RESNET.pt", map_location=torch.device("cpu"))
+    else:
+        model = torch.load("weights/VGG.pt", map_location=torch.device("cpu"))
+        
     model.eval() 
     
     # Transform to Tensor
