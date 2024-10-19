@@ -39,8 +39,9 @@ def check_image_quality(file_path, min_width, min_height):
             os.remove(file_path)
 
 def get_image_urls(query, number_of_links, sleep_time=1):
-
-    search_urls = [f"https://www.google.com/search?q={query}&tbm=isch", f"https://www.google.com/search?q={query}&udm=28"]
+    in_road = query + " In Road"
+    in_city = query + " In City"
+    search_urls = [f"https://www.google.com/search?q={query}&tbm=isch", f"https://www.google.com/search?q={in_road}&tbm=isch", f"https://www.google.com/search?q={in_city}&tbm=isch", f"https://www.google.com/search?q={query}&udm=28"]
     
     image_urls = set()
     for search_url in search_urls:
@@ -94,7 +95,7 @@ def download_images(image_urls, folder_path, min_height, min_width, time_sleep =
             print(f"Failed to download image {i+1} due to {e}")
 
 labels = ["Stop Sign", "Yield Sign", "Speed Limit Sign", "Pedestrian Crossing Sign", "No Entry Sign"]
-max_images = 2000
+max_images = 5000
 min_height = 100
 min_width = 100
 
