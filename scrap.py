@@ -114,7 +114,6 @@ if not os.path.exists("image_urls_all.pkl"):
 with open("image_urls_all.pkl", "rb") as f:
     image_urls_all = pickle.load(f)
 
-print(len(image_urls_all[1]))
 for i in range(len(labels)):
     label = labels[i]
     download_images(image_urls_all[i], f"./images/{label}", min_height=min_height, min_width=min_width)
