@@ -38,7 +38,7 @@ def add_images_from_scraped_images(scraped_path, dataset_path):
 
 
 def merge_kaggle_images(kaggle_path, dataset_path, image_metadata):
-    label_convert = {"speedlimit": "speedlimit", "stop": "stop"}
+    label_convert = {"speedlimit": "speedlimit", "stop": "stop", "crosswalk": "pedestriancrossing"}
 
     if not os.path.exists(kaggle_path):
         return
