@@ -38,7 +38,7 @@ def add_images_from_scraped_images(scraped_path, dataset_path):
 
 
 def merge_kaggle_images(kaggle_path, dataset_path, image_metadata):
-    label_convert = {"speedlimit": "speedlimit", "stop": "stop"}
+    label_convert = {"speedlimit": "speedlimit", "stop": "stop", "crosswalk": "pedestriancrossing"}
 
     if not os.path.exists(kaggle_path):
         return
@@ -91,8 +91,21 @@ if __name__ == '__main__':
 
     metadata = pd.DataFrame.from_dict(metadata, orient="index")
     metadata.to_csv(os.path.join(dataset_directory, "metadata.csv"), index=False)
+    
+
     train_data, test_data = train_test_split(metadata, test_size=0.2, random_state=881,
                                              stratify=metadata["label"])
+    
+    google = metadata[metadata['data_source'] == 'https://images.google.com']
+    kaggle = metadata[metadata['data_source'] != 'https://images.google.com']
+
+    common_labels = pd.merge(google[['label']], kaggle[['label']], on='label')['label'].unique()
+
+    google = google[google['label'].isin(common_labels)]
+    kaggle = kaggle[kaggle['label'].isin(common_labels)]
+
+    google.to_csv(os.path.join(dataset_directory, "metadata_google.csv"), index=False)
+    kaggle.to_csv(os.path.join(dataset_directory, "metadata_kaggle.csv"), index=False)
 
     train_data.to_csv(os.path.join(dataset_directory, "metadata_train.csv"), index=False)
     test_data.to_csv(os.path.join(dataset_directory, "metadata_test.csv"), index=False)
