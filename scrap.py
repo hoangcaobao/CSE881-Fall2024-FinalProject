@@ -6,7 +6,7 @@ import time
 import os
 import base64
 from PIL import Image
-
+import pickle
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 
@@ -38,41 +38,43 @@ def check_image_quality(file_path, min_width, min_height):
         if os.path.exists(file_path):
             os.remove(file_path)
 
-def get_image_urls(query, number_of_links, sleep_time=2):
-
-    search_url = f"https://www.google.com/search?q={query}&tbm=isch"
+def get_image_urls(query, number_of_links, sleep_time=1):
+    in_road = query + " In Road"
+    in_city = query + " In City"
+    search_urls = [f"https://www.google.com/search?q={query}&tbm=isch", f"https://www.google.com/search?q={in_road}&tbm=isch", f"https://www.google.com/search?q={in_city}&tbm=isch", f"https://www.google.com/search?q={query}&udm=28"]
     
-    # Open the Google Images page for the search query
-    driver.get(search_url)
     image_urls = set()
+    for search_url in search_urls:
+        # Open the Google Images page for the search query
+        driver.get(search_url)
+        
+        iteration = 0
+        
+        while len(image_urls) < number_of_links and iteration < 20:
+            iteration += 1
+            time.sleep(sleep_time)
+            soup = BeautifulSoup(driver.page_source, "html.parser")
 
-    iteration = 0
-    
-    while len(image_urls) < number_of_links and iteration < 20:
-        iteration += 1
-        time.sleep(sleep_time)
-        soup = BeautifulSoup(driver.page_source, "html.parser")
+            # Find all the image elements on the page
+            image_elements = soup.find_all("img")
 
-        # Find all the image elements on the page
-        image_elements = soup.find_all("img")
+            # Extract image URLs from the image elements
+            for img in image_elements:
+                if(len(image_urls) > number_of_links):
+                    break
+                img_url = img.get("src")
+                img_height = img.get("height")
+                img_width = img.get("width")
 
-        # Extract image URLs from the image elements
-        for img in image_elements:
-            if(len(image_urls) > number_of_links):
-                break
-            img_url = img.get("src")
-            img_height = img.get("height")
-            img_width = img.get("width")
+                # Avoid too small image
+                if (img_height and int(img_height) <= 20) or (img_width and int(img_width) <= 20):
+                    continue
+                
+                if img_url and img_url not in image_urls:
+                    image_urls.add(img_url)
 
-            # Avoid too small image
-            if (img_height and int(img_height) <= 20) or (img_width and int(img_width) <= 20):
-                continue
-            
-            if img_url and img_url not in image_urls:
-                image_urls.add(img_url)
-
-        # Scroll the page
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            # Scroll the page
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
     return image_urls
 
@@ -93,13 +95,28 @@ def download_images(image_urls, folder_path, min_height, min_width, time_sleep =
             print(f"Failed to download image {i+1} due to {e}")
 
 labels = ["Stop Sign", "Yield Sign", "Speed Limit Sign", "Pedestrian Crossing Sign", "No Entry Sign"]
-max_images = 2000
+max_images = 5000
 min_height = 100
 min_width = 100
 
-for label in labels:
-    image_urls = get_image_urls(label, max_images)
-    download_images(image_urls, f"./images/{label}", min_height=min_height, min_width=min_width)
+
+if not os.path.exists("image_urls_all.pkl"):
+    image_urls_all = []
+
+    for label in labels:
+        image_urls = get_image_urls(label, max_images)
+        image_urls_all.append(image_urls)
+        print(len(image_urls))
+
+    with open("image_urls_all.pkl", "wb") as f:
+        pickle.dump(image_urls_all, f)
+
+with open("image_urls_all.pkl", "rb") as f:
+    image_urls_all = pickle.load(f)
+
+for i in range(len(labels)):
+    label = labels[i]
+    download_images(image_urls_all[i], f"./images/{label}", min_height=min_height, min_width=min_width)
 
 # Close the browser session
 driver.quit()
