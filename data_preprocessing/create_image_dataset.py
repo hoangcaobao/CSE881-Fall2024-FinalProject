@@ -18,7 +18,10 @@ def add_images_from_scraped_images(scraped_path, dataset_path):
         os.makedirs(dataset_path)
 
     for img_dir in os.listdir(scraped_path):
-        label = "".join(img_dir.lower().split(" ")[:-1])
+        if label == "Traffic Light":
+            label = "trafficlight"
+        else:
+            label = "".join(img_dir.lower().split(" ")[:-1])
         label_directory = os.path.join(scraped_path, img_dir)
         for img_path in os.listdir(label_directory):
             ids = len(image_metadata)
@@ -38,7 +41,7 @@ def add_images_from_scraped_images(scraped_path, dataset_path):
 
 
 def merge_kaggle_images(kaggle_path, dataset_path, image_metadata):
-    label_convert = {"speedlimit": "speedlimit", "stop": "stop", "crosswalk": "pedestriancrossing"}
+    label_convert = {"speedlimit": "speedlimit", "stop": "stop", "crosswalk": "crosswalk", "trafficlight": "trafficlight"}
 
     if not os.path.exists(kaggle_path):
         return
