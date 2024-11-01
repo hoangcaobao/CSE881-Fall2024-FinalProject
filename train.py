@@ -24,6 +24,16 @@ if __name__ == "__main__":
     train_dataset = RoadSignDataset("dataset/metadata_train.csv")
     test_dataset = RoadSignDataset("dataset/metadata_test.csv")
 
+    # TRAIN ON GOOGLE, TEST ON KAGGLE
+    # train_dataset = RoadSignDataset("dataset/metadata_google.csv")
+    # test_dataset = RoadSignDataset("dataset/metadata_kaggle.csv")
+
+    # TRAIN ON KAGGLE, TEST ON GOOGLE
+    # train_dataset = RoadSignDataset("dataset/metadata_kaggle.csv")
+    # test_dataset = RoadSignDataset("dataset/metadata_google.csv")
+
+    num_classes = len(train_dataset.index_label)
+
     torch.manual_seed(args.seed)
 
     num_features = len(train_dataset.index_label)
@@ -38,12 +48,12 @@ if __name__ == "__main__":
 
     if args.model == "VGG":
         model = models.vgg16(weights=True)
-        model.classifier[6] = nn.Linear(4096, 7) 
+        model.classifier[6] = nn.Linear(4096, num_classes) 
     elif args.model == "RESNET":
         model = models.resnet50(weights=True)
-        model.fc = nn.Linear(model.fc.in_features, 7)
+        model.fc = nn.Linear(model.fc.in_features, num_classes)
     else:
-        model = SimpleCNN(num_classes=7)
+        model = SimpleCNN(num_classes=num_classes)
     
     model = model.to(device)
     loss_fn = nn.CrossEntropyLoss()
@@ -77,5 +87,3 @@ if __name__ == "__main__":
             preds.extend(pred.tolist())
 
     print(accuracy_score(ground_truth, preds))
-
-
