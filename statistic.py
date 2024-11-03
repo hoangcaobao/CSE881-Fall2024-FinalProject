@@ -1,9 +1,13 @@
 import pickle
+from glob import glob
 
-labels = ["Stop Sign", "Yield Sign", "Speed Limit Sign", "Pedestrian Crossing Sign", "No Entry Sign"]
 
-with open("image_urls_all.pkl", "rb") as f:
-    urls = pickle.load(f)
+labels = ["Stop Sign", "Speed Limit Sign", "Crosswalk Sign", "Traffic Light"]
+cnt = 0
 
-for i in range(len(labels)):
-    print(f"{labels[i]} has {len(urls[i])} images")
+for label in labels:
+    paths = glob(f"images/{label}/*.jpg")
+    cnt += len(paths)
+    print(f"{label} has {len(paths)} images")
+
+print(f"Total {cnt} images")

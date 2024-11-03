@@ -87,5 +87,3 @@ if __name__ == "__main__":
             preds.extend(pred.tolist())
 
     print(accuracy_score(ground_truth, preds))
-
-
