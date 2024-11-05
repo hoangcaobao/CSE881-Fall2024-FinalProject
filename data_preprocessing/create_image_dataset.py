@@ -24,6 +24,8 @@ def add_images_from_scraped_images(scraped_path, dataset_path):
             label = "".join(img_dir.lower().split(" ")[:-1])
         label_directory = os.path.join(scraped_path, img_dir)
         for img_path in os.listdir(label_directory):
+            if img_path == ".DS_Store":
+                continue
             ids = len(image_metadata)
 
             image_name = f"sign{ids:04d}"
@@ -34,6 +36,7 @@ def add_images_from_scraped_images(scraped_path, dataset_path):
             image_metadata[image_name]["data_source"] = "https://images.google.com"
 
             img = cv2.imread(os.path.join(label_directory, img_path))
+            # print(os.path.join(label_directory, img_path))
             img = resize(img)
             cv2.imwrite(f"{dataset_path}/{image_name}.png", img)
 
@@ -81,7 +84,7 @@ def merge_kaggle_images(kaggle_path, dataset_path, image_metadata):
 
 if __name__ == '__main__':
     # creating meta data from scraped image and kaggle dataset
-    scraped_images_directories = "../images"
+    scraped_images_directories = "../images-2"
     kaggle_path = "../kaggle"
 
     dataset_directory = "../dataset/"
@@ -94,20 +97,30 @@ if __name__ == '__main__':
 
     metadata = pd.DataFrame.from_dict(metadata, orient="index")
     metadata.to_csv(os.path.join(dataset_directory, "metadata.csv"), index=False)
+
+    #
+    metadata["balance"] = metadata["label"] + "_" + metadata["data_source"]
     
     train_data, test_data = train_test_split(metadata, test_size=0.2, random_state=881,
-                                             stratify=metadata["label"])
-    
-    google = metadata[metadata['data_source'] == 'https://images.google.com']
-    kaggle = metadata[metadata['data_source'] != 'https://images.google.com']
+                                             stratify=metadata["balance"])
 
-    common_labels = pd.merge(google[['label']], kaggle[['label']], on='label')['label'].unique()
-
-    google = google[google['label'].isin(common_labels)]
-    kaggle = kaggle[kaggle['label'].isin(common_labels)]
-
-    google.to_csv(os.path.join(dataset_directory, "metadata_google.csv"), index=False)
-    kaggle.to_csv(os.path.join(dataset_directory, "metadata_kaggle.csv"), index=False)
+    train_data.drop(["balance"], axis=1, inplace=True)
+    test_data.drop(["balance"], axis=1, inplace=True)
 
     train_data.to_csv(os.path.join(dataset_directory, "metadata_train.csv"), index=False)
     test_data.to_csv(os.path.join(dataset_directory, "metadata_test.csv"), index=False)
+
+    # Google Train
+
+    google_train = train_data[train_data["data_source"] == 'https://images.google.com']
+    google_test = test_data[test_data["data_source"] == 'https://images.google.com']
+
+    google_train.to_csv(os.path.join(dataset_directory, "metadata_train_google.csv"), index=False)
+    google_test.to_csv(os.path.join(dataset_directory, "metadata_test_google.csv"), index=False)
+
+    kaggle_train = train_data[train_data["data_source"] != 'https://images.google.com']
+    kaggle_test = test_data[test_data["data_source"] != 'https://images.google.com']
+
+    kaggle_train.to_csv(os.path.join(dataset_directory, "metadata_train_kaggle.csv"), index=False)
+    kaggle_test.to_csv(os.path.join(dataset_directory, "metadata_test_kaggle.csv"), index=False)
+
