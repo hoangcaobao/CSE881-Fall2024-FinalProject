@@ -16,21 +16,21 @@ if __name__ == "__main__":
     # gpu, mps
     parser.add_argument("--device", type=str, default="0", required=False)
     parser.add_argument("--seed", type=int, default = 42, required=False)
-    
-    # CNN, VGG
+    parser.add_argument("--train", type=str, default = "google", required=False) # google, kaggle, all
+
+    # CNN, VGG, RESNET
     parser.add_argument("--model", type = str, default="RESNET", required=False)
 
     args = parser.parse_args()
-    train_dataset = RoadSignDataset("dataset/metadata_train.csv")
-    test_dataset = RoadSignDataset("dataset/metadata_test.csv")
+    
+    if args.train == "all":
+        train_csv = "dataset/metadata_train.csv"
+    else:
+        train_csv = f"dataset/metadata_train_{args.train}.csv"
 
-    # TRAIN ON GOOGLE, TEST ON KAGGLE
-    # train_dataset = RoadSignDataset("dataset/metadata_google.csv")
-    # test_dataset = RoadSignDataset("dataset/metadata_kaggle.csv")
+    train_dataset = RoadSignDataset(train_csv)
 
-    # TRAIN ON KAGGLE, TEST ON GOOGLE
-    # train_dataset = RoadSignDataset("dataset/metadata_kaggle.csv")
-    # test_dataset = RoadSignDataset("dataset/metadata_google.csv")
+    test = ["all", "google", "kaggle"]
 
     num_classes = len(train_dataset.index_label)
 
@@ -39,8 +39,7 @@ if __name__ == "__main__":
     num_features = len(train_dataset.index_label)
 
     train_loader = DataLoader(train_dataset, batch_size=16)
-    test_loader = DataLoader(test_dataset, batch_size=16)
-
+    
     if args.device == "mps":
         device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
     else:
@@ -73,17 +72,27 @@ if __name__ == "__main__":
 
     torch.save(model, f"weights/{args.model}.pt")
 
-    preds = []
-    ground_truth = []
-    with torch.no_grad():
-        for images, labels in test_loader:
-            model.eval()
-            with torch.no_grad():
-                images = images.to(device)
-                labels = labels.to(device)
-                outputs = model(images)
-            ground_truth.extend(labels.tolist())
-            _, pred = torch.max(outputs.data, 1)
-            preds.extend(pred.tolist())
+    for t in test:
+        
+        if t == "all":
+            test_csv = "dataset/metadata_test.csv"
+        else:
+            test_csv = f"dataset/metadata_test_{t}.csv"
 
-    print(accuracy_score(ground_truth, preds))
+        test_dataset = RoadSignDataset(test_csv)
+        test_loader = DataLoader(test_dataset, batch_size=16)
+
+        preds = []
+        ground_truth = []
+        with torch.no_grad():
+            for images, labels in test_loader:
+                model.eval()
+                with torch.no_grad():
+                    images = images.to(device)
+                    labels = labels.to(device)
+                    outputs = model(images)
+                ground_truth.extend(labels.tolist())
+                _, pred = torch.max(outputs.data, 1)
+                preds.extend(pred.tolist())
+
+        print(f"Accuracy on {t} is {accuracy_score(ground_truth, preds)}")
