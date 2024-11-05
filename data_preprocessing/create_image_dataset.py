@@ -17,13 +17,13 @@ def add_images_from_scraped_images(scraped_path, dataset_path):
     if not os.path.exists(dataset_path):
         os.makedirs(dataset_path)
 
-    for img_dir in os.listdir(scraped_path):
+    for img_dir in sorted(os.listdir(scraped_path)):
         if img_dir == "Traffic Light":
             label = "trafficlight"
         else:
             label = "".join(img_dir.lower().split(" ")[:-1])
         label_directory = os.path.join(scraped_path, img_dir)
-        for img_path in os.listdir(label_directory):
+        for img_path in sorted(os.listdir(label_directory)):
             if img_path == ".DS_Store":
                 continue
             ids = len(image_metadata)
@@ -50,7 +50,7 @@ def merge_kaggle_images(kaggle_path, dataset_path, image_metadata):
         return
 
     annotations_paths = os.path.join(kaggle_path, "annotations")
-    for annotation in os.listdir(annotations_paths):
+    for annotation in sorted(os.listdir(annotations_paths)):
 
         tree = ET.parse(os.path.join(annotations_paths, annotation))
         root = tree.getroot()
@@ -84,7 +84,7 @@ def merge_kaggle_images(kaggle_path, dataset_path, image_metadata):
 
 if __name__ == '__main__':
     # creating meta data from scraped image and kaggle dataset
-    scraped_images_directories = "../images-2"
+    scraped_images_directories = "../images"
     kaggle_path = "../kaggle"
 
     dataset_directory = "../dataset/"
@@ -123,4 +123,3 @@ if __name__ == '__main__':
 
     kaggle_train.to_csv(os.path.join(dataset_directory, "metadata_train_kaggle.csv"), index=False)
     kaggle_test.to_csv(os.path.join(dataset_directory, "metadata_test_kaggle.csv"), index=False)
-
