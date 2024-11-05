@@ -17,13 +17,16 @@ def add_images_from_scraped_images(scraped_path, dataset_path):
     if not os.path.exists(dataset_path):
         os.makedirs(dataset_path)
 
-    for img_dir in os.listdir(scraped_path):
+    list_img_dir = sorted(list(os.listdir(scraped_path)))
+    for img_dir in list_img_dir:
         if img_dir == "Traffic Light":
             label = "trafficlight"
         else:
             label = "".join(img_dir.lower().split(" ")[:-1])
         label_directory = os.path.join(scraped_path, img_dir)
-        for img_path in os.listdir(label_directory):
+
+        label_dir_path = sorted(list(os.listdir(label_directory)))
+        for img_path in label_dir_path:
             if img_path == ".DS_Store":
                 continue
             ids = len(image_metadata)
@@ -50,7 +53,8 @@ def merge_kaggle_images(kaggle_path, dataset_path, image_metadata):
         return
 
     annotations_paths = os.path.join(kaggle_path, "annotations")
-    for annotation in os.listdir(annotations_paths):
+    list_path = sorted(list(os.listdir(annotations_paths)))
+    for annotation in list_path:
 
         tree = ET.parse(os.path.join(annotations_paths, annotation))
         root = tree.getroot()
@@ -79,7 +83,7 @@ def merge_kaggle_images(kaggle_path, dataset_path, image_metadata):
         img = resize(img)
         cv2.imwrite(f"{dataset_path}/{new_img_name}.png", img)
 
-    return metadata
+    return image_metadata
 
 
 if __name__ == '__main__':
@@ -100,7 +104,7 @@ if __name__ == '__main__':
 
     #
     metadata["balance"] = metadata["label"] + "_" + metadata["data_source"]
-    
+
     train_data, test_data = train_test_split(metadata, test_size=0.2, random_state=881,
                                              stratify=metadata["balance"])
 
