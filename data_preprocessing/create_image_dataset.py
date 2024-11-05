@@ -98,7 +98,7 @@ if __name__ == '__main__':
     metadata = pd.DataFrame.from_dict(metadata, orient="index")
     metadata.to_csv(os.path.join(dataset_directory, "metadata.csv"), index=False)
 
-    #
+    # split data with balanced on Kaggle and Google source
     metadata["balance"] = metadata["label"] + "_" + metadata["data_source"]
     
     train_data, test_data = train_test_split(metadata, test_size=0.2, random_state=881,
