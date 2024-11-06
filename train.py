@@ -10,16 +10,28 @@ from torchvision import models
 from model.SimpleCNN import SimpleCNN
 import argparse
 from sklearn.metrics import accuracy_score
+import random
+import numpy as np
+
+def set_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)  # if you are using multi-GPU.
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # gpu, mps
-    parser.add_argument("--device", type=str, default="0", required=False)
+    parser.add_argument("--device", type=str, default="1", required=False)
     parser.add_argument("--seed", type=int, default = 42, required=False)
-    parser.add_argument("--train", type=str, default = "google", required=False) # google, kaggle, all
+    parser.add_argument("--train", type=str, default = "all", required=False) # google, kaggle, all
 
     # CNN, VGG, RESNET
-    parser.add_argument("--model", type = str, default="RESNET", required=False)
+    parser.add_argument("--model", type = str, default="VGG", required=False)
 
     args = parser.parse_args()
     
@@ -30,11 +42,11 @@ if __name__ == "__main__":
 
     train_dataset = RoadSignDataset(train_csv)
 
-    test = ["all", "google", "kaggle"]
+    test =  ["google", "kaggle", "all"]
 
     num_classes = len(train_dataset.index_label)
 
-    torch.manual_seed(args.seed)
+    set_seed(42)
 
     num_features = len(train_dataset.index_label)
 
@@ -96,3 +108,4 @@ if __name__ == "__main__":
                 preds.extend(pred.tolist())
 
         print(f"Accuracy on {t} is {accuracy_score(ground_truth, preds)}")
+
