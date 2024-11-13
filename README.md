@@ -1,5 +1,6 @@
-# CSE881
-CSE 881 Road Sign Detection Project
+# CSE881 - Final Project
+
+Code for CSE 881 - Final Project: Road Sign Detection, developed by Bao Hoang and Tanawan Premsri.
 
 ## Google Data Scraping
 To scrap images from Google, run ```python3 scrap.py```
