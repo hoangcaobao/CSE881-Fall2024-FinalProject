@@ -85,7 +85,7 @@ def merge_kaggle_images(kaggle_path, dataset_path, image_metadata):
 
 if __name__ == '__main__':
     # creating meta data from scraped image and kaggle dataset
-    scraped_images_directories = "../images-2"
+    scraped_images_directories = "../images"
     kaggle_path = "../kaggle"
 
     dataset_directory = "../dataset/"
