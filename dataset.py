@@ -17,8 +17,9 @@ class RoadSignDataset(Dataset):
         if index_label is not None:
             self.index_label = index_label
         else:
-            index_label = {label: 0 for label in self.metadata["label"]}
-            index_label = {label: i for i, label in enumerate(sorted(index_label.keys()))}
+            label_index = sorted(list(set(self.metadata["label"])))
+            index_label = {label: i for i, label in enumerate(label_index)}
+            self.label_index = label_index
             self.index_label = index_label
 
         initial_process = []
