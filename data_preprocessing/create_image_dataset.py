@@ -17,13 +17,13 @@ def add_images_from_scraped_images(scraped_path, dataset_path):
     if not os.path.exists(dataset_path):
         os.makedirs(dataset_path)
 
-    for img_dir in os.listdir(scraped_path):
+    for img_dir in sorted(os.listdir(scraped_path)):
         if img_dir == "Traffic Light":
             label = "trafficlight"
         else:
             label = "".join(img_dir.lower().split(" ")[:-1])
         label_directory = os.path.join(scraped_path, img_dir)
-        for img_path in os.listdir(label_directory):
+        for img_path in sorted(os.listdir(label_directory)):
             if img_path == ".DS_Store":
                 continue
             ids = len(image_metadata)
@@ -36,7 +36,6 @@ def add_images_from_scraped_images(scraped_path, dataset_path):
             image_metadata[image_name]["data_source"] = "https://images.google.com"
 
             img = cv2.imread(os.path.join(label_directory, img_path))
-            # print(os.path.join(label_directory, img_path))
             img = resize(img)
             cv2.imwrite(f"{dataset_path}/{image_name}.png", img)
 
@@ -44,7 +43,8 @@ def add_images_from_scraped_images(scraped_path, dataset_path):
 
 
 def merge_kaggle_images(kaggle_path, dataset_path, image_metadata):
-    label_convert = {"speedlimit": "speedlimit", "stop": "stop", "crosswalk": "crosswalk", "trafficlight": "trafficlight"}
+    label_convert = {"speedlimit": "speedlimit", "stop": "stop", "crosswalk": "crosswalk",
+                     "trafficlight": "trafficlight"}
 
     if not os.path.exists(kaggle_path):
         return
@@ -80,12 +80,46 @@ def merge_kaggle_images(kaggle_path, dataset_path, image_metadata):
         img = resize(img)
         cv2.imwrite(f"{dataset_path}/{new_img_name}.png", img)
 
-    return image_metadata
+    return metadata
+
+
+def merge_generated_image(generated_path, dataset_path, image_metadata):
+    label_convert = {"speedlimit": "speedlimit", "stop": "stop", "crosswalk": "crosswalk",
+                     "trafficlight": "trafficlight"}
+
+    if not os.path.exists(kaggle_path):
+        return
+
+    for annotation in sorted(os.listdir(generated_path)):
+
+        # print(img_name)
+
+        label = "".join(annotation.split("_")[:-2])
+        if label not in label_convert:
+            continue
+
+        label = label_convert[label]
+
+        ids = len(image_metadata)
+        new_img_name = f"sign{ids:04d}"
+
+        image_metadata[new_img_name] = {}
+
+        image_metadata[new_img_name]["id"] = new_img_name + ".png"
+        image_metadata[new_img_name]["label"] = label
+        image_metadata[new_img_name]["data_source"] \
+            = "Stable Diffusion 2.1"
+
+        img = cv2.imread(os.path.join(generated_path, annotation))
+        img = resize(img)
+        cv2.imwrite(f"{dataset_path}/{new_img_name}.png", img)
+
+    return metadata
 
 
 if __name__ == '__main__':
     # creating meta data from scraped image and kaggle dataset
-    scraped_images_directories = "../images-2"
+    scraped_images_directories = "../images"
     kaggle_path = "../kaggle"
 
     dataset_directory = "../dataset/"
@@ -99,29 +133,24 @@ if __name__ == '__main__':
     metadata = pd.DataFrame.from_dict(metadata, orient="index")
     metadata.to_csv(os.path.join(dataset_directory, "metadata.csv"), index=False)
 
-    #
-    metadata["balance"] = metadata["label"] + "_" + metadata["data_source"]
-
     train_data, test_data = train_test_split(metadata, test_size=0.2, random_state=881,
-                                             stratify=metadata["balance"])
+                                             stratify=metadata["label"])
 
-    train_data.drop(["balance"], axis=1, inplace=True)
-    test_data.drop(["balance"], axis=1, inplace=True)
+    google = metadata[metadata['data_source'] == 'https://images.google.com']
+    kaggle = metadata[metadata['data_source'] != 'https://images.google.com']
+
+    common_labels = pd.merge(google[['label']], kaggle[['label']], on='label')['label'].unique()
+
+    google = google[google['label'].isin(common_labels)]
+    kaggle = kaggle[kaggle['label'].isin(common_labels)]
+
+    google.to_csv(os.path.join(dataset_directory, "metadata_google.csv"), index=False)
+    kaggle.to_csv(os.path.join(dataset_directory, "metadata_kaggle.csv"), index=False)
 
     train_data.to_csv(os.path.join(dataset_directory, "metadata_train.csv"), index=False)
     test_data.to_csv(os.path.join(dataset_directory, "metadata_test.csv"), index=False)
 
-    # Google Train
-
-    google_train = train_data[train_data["data_source"] == 'https://images.google.com']
-    google_test = test_data[test_data["data_source"] == 'https://images.google.com']
-
-    google_train.to_csv(os.path.join(dataset_directory, "metadata_train_google.csv"), index=False)
-    google_test.to_csv(os.path.join(dataset_directory, "metadata_test_google.csv"), index=False)
-
-    kaggle_train = train_data[train_data["data_source"] != 'https://images.google.com']
-    kaggle_test = test_data[test_data["data_source"] != 'https://images.google.com']
-
-    kaggle_train.to_csv(os.path.join(dataset_directory, "metadata_train_kaggle.csv"), index=False)
-    kaggle_test.to_csv(os.path.join(dataset_directory, "metadata_test_kaggle.csv"), index=False)
-
+    generate_image_dir = "../gen_images"
+    print(len(metadata))
+    metadata = merge_generated_image(generate_image_dir, dataset_img_dir, metadata)
+    print(len(metadata))
