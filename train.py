@@ -26,15 +26,17 @@ def set_seed(seed):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # gpu, mps
-    parser.add_argument("--device", type=str, default="1", required=False)
+    parser.add_argument("--device", type=str, default="3", required=False)
     parser.add_argument("--seed", type=int, default = 42, required=False)
-    parser.add_argument("--train", type=str, default = "all", required=False) # google, kaggle, all
+    parser.add_argument("--train", type=str, default = "kaggle", required=False) # google, kaggle, all
 
     # CNN, VGG, RESNET
     parser.add_argument("--model", type = str, default="VGG", required=False)
 
     args = parser.parse_args()
     
+    set_seed(42)
+
     if args.train == "all":
         train_csv = "dataset/metadata_train.csv"
     else:
@@ -46,11 +48,7 @@ if __name__ == "__main__":
 
     num_classes = len(train_dataset.index_label)
 
-    set_seed(42)
-
-    num_features = len(train_dataset.index_label)
-
-    train_loader = DataLoader(train_dataset, batch_size=16)
+    train_loader = DataLoader(train_dataset, batch_size=128, shuffle = True)
     
     if args.device == "mps":
         device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
@@ -58,7 +56,7 @@ if __name__ == "__main__":
         device = torch.device(f"cuda:{args.device}" if torch.cuda.is_available() else "cpu")
 
     if args.model == "VGG":
-        model = models.vgg16(weights=True)
+        model = models.vgg16(weights=models.VGG16_Weights.DEFAULT)
         model.classifier[6] = nn.Linear(4096, num_classes) 
     elif args.model == "RESNET":
         model = models.resnet50(weights=True)
@@ -92,7 +90,7 @@ if __name__ == "__main__":
             test_csv = f"dataset/metadata_test_{t}.csv"
 
         test_dataset = RoadSignDataset(test_csv)
-        test_loader = DataLoader(test_dataset, batch_size=16)
+        test_loader = DataLoader(test_dataset, batch_size=128, shuffle = False)
 
         preds = []
         ground_truth = []
@@ -108,4 +106,5 @@ if __name__ == "__main__":
                 preds.extend(pred.tolist())
 
         print(f"Accuracy on {t} is {accuracy_score(ground_truth, preds)}")
+
 
