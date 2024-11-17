@@ -15,20 +15,20 @@ import shutil
 
 NUM_CLASSES = 4
 
-WEIGHT_PATH = "weights/RESNET.pt"
+WEIGHT_PATH = "weights/VGG.pt"
 IMG_DIR = "dataset/images"
-SELECT_IMG_DIR = "wrong_google_resnet"
+SELECT_IMG_DIR = "wrong_google_vgg"
 
 
 def get_parser():
     parser = argparse.ArgumentParser()
     # gpu, mps
-    parser.add_argument("--device", type=str, default="mps", required=False)
+    parser.add_argument("--device", type=str, default="1", required=False)
     parser.add_argument("--seed", type=int, default=42, required=False)
     parser.add_argument("--train", type=str, default="all", required=False)  # google, kaggle, all
     # CNN, VGG, RESNET
-    parser.add_argument("--model", type=str, default="RESNET", required=False)
-    parser.add_argument("--provide_incorrect", type=str, default="incorrect_CLIP.csv", required=False)
+    parser.add_argument("--model", type=str, default="VGG", required=False)
+    parser.add_argument("--provide_incorrect", type=str, default=None, required=False)
     args = parser.parse_args()
     return args
 
@@ -40,17 +40,17 @@ def main(args):
         device = torch.device(f"cuda:{args.device}" if torch.cuda.is_available() else "cpu")
 
     if args.model == "VGG":
-        model = models.vgg16(weights=True)
-        model.classifier[6] = nn.Linear(4096, NUM_CLASSES)
+        model = models.vgg16(weights=models.VGG16_Weights.IMAGENET1K_V1)
+        model.classifier[6] = nn.Linear(4096, 4) 
     elif args.model == "RESNET":
-        model = models.resnet50(weights=True)
-        model.fc = nn.Linear(model.fc.in_features, NUM_CLASSES)
+        model = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
+        model.fc = nn.Linear(model.fc.in_features,4)
     else:
-        model = SimpleCNN(num_classes=NUM_CLASSES)
+        model = SimpleCNN(num_classes=4)
     model = model.to(device)
 
     if os.path.exists(WEIGHT_PATH):
-        model = torch.load(WEIGHT_PATH, weights_only=False)
+        model = torch.load(WEIGHT_PATH, weights_only=False, map_location=device)
 
     test_csv = f"dataset/metadata_test_google.csv"
     test_meta_data = pd.read_csv(test_csv)
@@ -93,6 +93,7 @@ def main(args):
         shutil.copy(os.path.join(IMG_DIR, img_id), os.path.join(SELECT_IMG_DIR, img_id))
         new_data.append((img_data["id"], img_data["label"], pred))
     new_data_df = pd.DataFrame(new_data, columns=["id", "label", "pred"])
+    new_data_df = new_data_df.sort_values(by=["id"])
     new_data_df.to_csv(os.path.join(SELECT_IMG_DIR, "metadata.csv"))
 
 
