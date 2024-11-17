@@ -26,7 +26,7 @@ def set_seed(seed):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # gpu, mps
-    parser.add_argument("--device", type=str, default="3", required=False)
+    parser.add_argument("--device", type=str, default="1", required=False)
     parser.add_argument("--seed", type=int, default = 42, required=False)
     parser.add_argument("--train", type=str, default = "kaggle", required=False) # google, kaggle, all
 
@@ -56,10 +56,10 @@ if __name__ == "__main__":
         device = torch.device(f"cuda:{args.device}" if torch.cuda.is_available() else "cpu")
 
     if args.model == "VGG":
-        model = models.vgg16(weights=models.VGG16_Weights.DEFAULT)
+        model = models.vgg16(weights=models.VGG16_Weights.IMAGENET1K_V1)
         model.classifier[6] = nn.Linear(4096, num_classes) 
     elif args.model == "RESNET":
-        model = models.resnet50(weights=True)
+        model = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
         model.fc = nn.Linear(model.fc.in_features, num_classes)
     else:
         model = SimpleCNN(num_classes=num_classes)
