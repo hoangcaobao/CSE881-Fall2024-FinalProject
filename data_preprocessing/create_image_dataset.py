@@ -129,28 +129,36 @@ if __name__ == '__main__':
     metadata = merge_kaggle_images(kaggle_path, dataset_img_dir, metadata)
 
     # Create metadata.csv
-
     metadata = pd.DataFrame.from_dict(metadata, orient="index")
     metadata.to_csv(os.path.join(dataset_directory, "metadata.csv"), index=False)
 
+    # split data with balanced on Kaggle and Google source
+    metadata["balance"] = metadata["label"] + "_" + metadata["data_source"]
+    
     train_data, test_data = train_test_split(metadata, test_size=0.2, random_state=881,
-                                             stratify=metadata["label"])
+                                             stratify=metadata["balance"])
 
-    google = metadata[metadata['data_source'] == 'https://images.google.com']
-    kaggle = metadata[metadata['data_source'] != 'https://images.google.com']
-
-    common_labels = pd.merge(google[['label']], kaggle[['label']], on='label')['label'].unique()
-
-    google = google[google['label'].isin(common_labels)]
-    kaggle = kaggle[kaggle['label'].isin(common_labels)]
-
-    google.to_csv(os.path.join(dataset_directory, "metadata_google.csv"), index=False)
-    kaggle.to_csv(os.path.join(dataset_directory, "metadata_kaggle.csv"), index=False)
+    train_data.drop(["balance"], axis=1, inplace=True)
+    test_data.drop(["balance"], axis=1, inplace=True)
 
     train_data.to_csv(os.path.join(dataset_directory, "metadata_train.csv"), index=False)
     test_data.to_csv(os.path.join(dataset_directory, "metadata_test.csv"), index=False)
 
-    generate_image_dir = "../gen_images"
-    print(len(metadata))
-    metadata = merge_generated_image(generate_image_dir, dataset_img_dir, metadata)
-    print(len(metadata))
+    # Google Train
+
+    google_train = train_data[train_data["data_source"] == 'https://images.google.com']
+    google_test = test_data[test_data["data_source"] == 'https://images.google.com']
+
+    google_train.to_csv(os.path.join(dataset_directory, "metadata_train_google.csv"), index=False)
+    google_test.to_csv(os.path.join(dataset_directory, "metadata_test_google.csv"), index=False)
+
+    kaggle_train = train_data[train_data["data_source"] != 'https://images.google.com']
+    kaggle_test = test_data[test_data["data_source"] != 'https://images.google.com']
+
+    kaggle_train.to_csv(os.path.join(dataset_directory, "metadata_train_kaggle.csv"), index=False)
+    kaggle_test.to_csv(os.path.join(dataset_directory, "metadata_test_kaggle.csv"), index=False)
+
+    # generate_image_dir = "../gen_images"
+    # print(len(metadata))
+    # metadata = merge_generated_image(generate_image_dir, dataset_img_dir, metadata)
+    # print(len(metadata))
