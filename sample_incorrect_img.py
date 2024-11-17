@@ -28,6 +28,7 @@ def get_parser():
     parser.add_argument("--train", type=str, default="all", required=False)  # google, kaggle, all
     # CNN, VGG, RESNET
     parser.add_argument("--model", type=str, default="RESNET", required=False)
+    parser.add_argument("--provide_incorrect", type=str, default="incorrect_CLIP.csv", required=False)
     args = parser.parse_args()
     return args
 
@@ -61,27 +62,32 @@ def main(args):
     test_dataset = RoadSignDataset(test_csv)
 
     incorrect_img = []
-    with torch.no_grad():
+    if not args.provide_incorrect:
+        with torch.no_grad():
 
-        for i in tqdm(range(len(test_dataset))):
-            (img, label) = test_dataset[i]
-            img = img.unsqueeze(0).to(device)
-            pred = model(img).argmax(dim=1).cpu().numpy()[0]
-            if label != pred:
-                incorrect_img.append((test_dataset.get_image_id(i), test_dataset.label_index[pred]))
+            for i in tqdm(range(len(test_dataset))):
+                (img, label) = test_dataset[i]
+                img = img.unsqueeze(0).to(device)
+                pred = model(img).argmax(dim=1).cpu().numpy()[0]
+                if label != pred:
+                    incorrect_img.append((test_dataset.get_image_id(i), test_dataset.label_index[pred]))
 
-    # Sample 100 images
-    random.seed(0)
-    print(len(incorrect_img))
-    selected_img = random.sample(incorrect_img, 100)
+        # Sample 100 images
+        random.seed(0)
+        print(len(incorrect_img))
+        selected_img = random.sample(incorrect_img, 100)
 
-    print(selected_img)
 
+        selected_img = pd.DataFrame(selected_img, columns=["img_id", "predict"])
+    else:
+        selected_img = pd.read_csv(args.provide_incorrect)
     new_data = []
 
     if not os.path.exists(SELECT_IMG_DIR):
         os.makedirs(SELECT_IMG_DIR)
-    for img_id, pred in selected_img:
+    for i, data in selected_img.iterrows():
+        img_id = data["img_id"]
+        pred = data["predict"]
         img_data = img_info[img_id]
 
         shutil.copy(os.path.join(IMG_DIR, img_id), os.path.join(SELECT_IMG_DIR, img_id))
