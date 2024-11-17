@@ -2,6 +2,9 @@
 __pycache__/
 *.py[cod]
 *$py.class
+wrong_google_resnet
+wrong_google_vgg
+wrong_google_clip
 
 images
 kaggle

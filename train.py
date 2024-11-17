@@ -26,12 +26,12 @@ def set_seed(seed):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # gpu, mps
-    parser.add_argument("--device", type=str, default="1", required=False)
+    parser.add_argument("--device", type=str, default="0", required=False)
     parser.add_argument("--seed", type=int, default = 42, required=False)
-    parser.add_argument("--train", type=str, default = "kaggle", required=False) # google, kaggle, all
+    parser.add_argument("--train", type=str, default = "all", required=False) # google, kaggle, all
 
     # CNN, VGG, RESNET
-    parser.add_argument("--model", type = str, default="VGG", required=False)
+    parser.add_argument("--model", type = str, default="RESNET", required=False)
 
     args = parser.parse_args()
     

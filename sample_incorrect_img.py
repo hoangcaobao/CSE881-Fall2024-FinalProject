@@ -15,9 +15,9 @@ import shutil
 
 NUM_CLASSES = 4
 
-WEIGHT_PATH = "weights/VGG.pt"
+WEIGHT_PATH = "weights/RESNET.pt"
 IMG_DIR = "dataset/images"
-SELECT_IMG_DIR = "wrong_google_vgg"
+SELECT_IMG_DIR = "wrong_google_clip"
 
 
 def get_parser():
@@ -27,8 +27,8 @@ def get_parser():
     parser.add_argument("--seed", type=int, default=42, required=False)
     parser.add_argument("--train", type=str, default="all", required=False)  # google, kaggle, all
     # CNN, VGG, RESNET
-    parser.add_argument("--model", type=str, default="VGG", required=False)
-    parser.add_argument("--provide_incorrect", type=str, default=None, required=False)
+    parser.add_argument("--model", type=str, default="RESNET", required=False)
+    parser.add_argument("--provide_incorrect", type=str, default="incorrect_CLIP-2.csv", required=False)
     args = parser.parse_args()
     return args
 
@@ -48,9 +48,11 @@ def main(args):
     else:
         model = SimpleCNN(num_classes=4)
     model = model.to(device)
-
+   
     if os.path.exists(WEIGHT_PATH):
         model = torch.load(WEIGHT_PATH, weights_only=False, map_location=device)
+
+    model.eval()
 
     test_csv = f"dataset/metadata_test_google.csv"
     test_meta_data = pd.read_csv(test_csv)
