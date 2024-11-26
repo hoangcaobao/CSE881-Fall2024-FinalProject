@@ -34,9 +34,9 @@ st.markdown("""
     ### About the Project
     With the rapid progress in autonomous driving technology, detecting and classifying road signs has become a critical task. Road signs provide essential information for safe and efficient navigation, making their accurate detection indispensable for modern autonomous vehicles.
 
-    This project leverages cutting-edge **Computer Vision** and **Deep Learning** techniques to build and evaluate high-performance road sign detection models. The models are trained on diverse road sign images collected from Google Images, Google Shopping, and Kaggle, covering 4 categories **Stop**, **Speed Limit**, **Traffic Light**, and **Cross Walk**.
+    This project leverages cutting-edge **Computer Vision** and **Deep Learning** techniques to build and evaluate high-performance road sign detection models. The models are trained on diverse road sign images collected from Google Images, Google Shopping, and Kaggle, covering 4 categories **Stop**, **Speed Limit**, **Traffic Light**, and **Cross Walk**. For more details, please refer to our source code and the final report at [https://github.com/hoangcaobao/CSE881](https://github.com/hoangcaobao/CSE881).
 
-    You can upload an image of a road sign below to see how well our fine-tuned models (ResNet and VGG) can classify it!
+    Below, you can upload an image of a road sign below to see how well our fine-tuned models (ResNet and VGG) can classify it!
 """)
 
 option = st.selectbox(
