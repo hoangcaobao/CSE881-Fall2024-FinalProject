@@ -45,7 +45,7 @@ option = st.selectbox(
 )
 
 uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
-label_mapping = {0: 'Cross Walk', 1: 'Speed Limit', 2: 'Stop', 3: "Traffic Light"}
+label_mapping = {0: 'Crosswalk Sign', 1: 'Speed Limit Sign', 2: 'Stop Sign', 3: "Traffic Light"}
 
 if uploaded_image is not None:
     # Open the uploaded image
@@ -83,4 +83,4 @@ if uploaded_image is not None:
     
     # Get label from prediction
     label = label_mapping[pred.item()]
-    st.write(f"Uploaded Image Is {label} Sign")
+    st.write(f"Uploaded Image Is {label}")
