@@ -3,7 +3,7 @@
 Code for CSE 881 - Final Project: Road Sign Detection, developed by Bao Hoang and Tanawan Premsri.
 
 ## Google Data Scraping
-To scrap images from Google, run ```python3 scrap.py```
+To scrap images from Google, run ```python3 scrape.py```
 
 ## Kaggle Dataset
 Please download images from the Kaggle website ([Road Sign Detection Dataset](https://www.kaggle.com/datasets/andrewmvd/road-sign-detection/data)) and place them in a folder named kaggle.
