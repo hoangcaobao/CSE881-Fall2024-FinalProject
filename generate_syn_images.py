@@ -8,6 +8,16 @@ from datasets import load_dataset
 from tqdm import tqdm
 from torchvision import transforms
 
+def parse_argument():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--cuda", type=int, default=0)
+    parser.add_argument("--model", type=str, default="stabilityai/stable-diffusion-2-1")
+    parser.add_argument("--output_dir", type=str, default="image_gen")
+    parser.add_argument("--num_repeat", type=int, default=100, help="number of repeat image per label")
+    parser.add_argument("--num_inference_steps", type=int, default=80, help="number of inference steps")
+
+    return parser.parse_args()
+
 
 def main(arg):
     cuda_number = arg.cuda
@@ -37,11 +47,5 @@ def main(arg):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--cuda", type=int, default=0)
-    parser.add_argument("--model", type=str, default="stabilityai/stable-diffusion-2-1")
-    parser.add_argument("--output_dir", type=str, default="image_gen")
-    parser.add_argument("--num_repeat", type=int, default=100, help="number of repeat image per label")
-    parser.add_argument("--num_inference_steps", type=int, default=80, help="number of inference steps")
-    arg = parser.parse_args()
+    arg = parse_argument()
     main(arg)
