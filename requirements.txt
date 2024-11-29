@@ -6,3 +6,5 @@ scikit-learn
 pandas
 torchvision
 tqdm
+sentence-transformers
+datasets
