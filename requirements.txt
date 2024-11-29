@@ -8,3 +8,4 @@ torchvision
 tqdm
 sentence-transformers
 datasets
+diffusers[torch]

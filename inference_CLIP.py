@@ -18,12 +18,15 @@ def parse_argument():
 
 
 def main(args):
+
+    # set device
     device = torch.device("cpu")
     if torch.cuda.is_available():
         device = torch.device(f"cuda:{args.cuda}")
 
-    model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").to(device)
-    processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+    model_id = "openai/clip-vit-base-patch32"
+    model = CLIPModel.from_pretrained().to(device)
+    processor = CLIPProcessor.from_pretrained(model_id)
     results = []
     dataset = RoadSignDataset(f"dataset/{args.data_path}.csv", return_raw_data=True)
     for idx, (img, label) in tqdm(enumerate(dataset)):
