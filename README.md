@@ -19,7 +19,31 @@ Please download images from the Kaggle website ([Road Sign Detection Dataset](ht
 ## Demos
 Here we provide several demos of results in the project report.
 
- 
+### 1. ResNet-50:
++ Train on Google dataset: ```python train.py --model RESNET --train google```
++ Train on Kaggle dataset: ```python train.py --model RESNET --train kaggle```
++ Train on both: ```python train.py --model RESNET --train all```
+
+### 2. VGG-16:
++ Train on Google dataset: ```python train.py --model VGG --train google```
++ Train on Kaggle dataset: ```python train.py --model VGG --train kaggle```
++ Train on both: ```python train.py --model VGG --train all```
+
+### 3. Inference CLIP:
+```python inference_CLIP.py --cuda 0 --train_set all```
+
+### 4. Train a classifier on CLIP's embedding:
++ Train on Google dataset: ```python train_CLIP_classifier.py --epoch 40 --train_set google``` 
++ Train on Kaggle dataset: ```python train_CLIP_classifier.py --epoch 40 --train_set google``` 
++ Train on both: ```python train_CLIP_classifier.py --epoch 40 --train_set all``` 
+
+### 5. Inference Llava:
+```python inference_Llava.py --data_path metadata_test```
+
+### 6. Llava + BLIP:
++ Firstly, we need to generation caption: ```python generate_caption.py --data_path metadata_test```
++ Then, run: ```python inference_Llava.py --use_BLIP T --data_path metadata_test```
+
 ## Run app
 We can run the app by ```streamlit run app.py``` to run locally.
 
