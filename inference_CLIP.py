@@ -28,7 +28,14 @@ def main(args):
     model = CLIPModel.from_pretrained().to(device)
     processor = CLIPProcessor.from_pretrained(model_id)
     results = []
-    dataset = RoadSignDataset(f"dataset/{args.data_path}.csv", return_raw_data=True)
+
+    if args.train_set.lower() == "google":
+        data_path = "metadata_test_google"
+    elif args.train_set.lower() == "kaggle":
+        data_path = "metadata_test_kaggle"
+    else:
+        data_path = "metadata_test"
+    dataset = RoadSignDataset(f"dataset/{data_path}.csv", return_raw_data=True)
     for idx, (img, label) in tqdm(enumerate(dataset)):
         # Preprocess the image
         inputs = processor(text=label_text, images=img, return_tensors="pt", padding=True).to(device)
