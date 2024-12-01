@@ -1,6 +1,11 @@
 import pandas as pd
+import argparse
 if __name__ == "__main__":
-    results = pd.read_csv("result_llava_next.csv")
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--result_file', default="result_llava_next.csv", type=str, required=True)
+    args = parser.parse_args()
+
+    results = pd.read_csv(args.result_file)
     total = len(results)
     acc = 0
     for i, result in results.iterrows():
