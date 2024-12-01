@@ -55,7 +55,7 @@ def inference_image(model, args):
 
     # Save predict result
     df = pd.DataFrame(results, columns=["image_id", "label", "predict"])
-    df.to_csv(f"result_llava_next_explain_{args.data_path}.csv", index=False)
+    df.to_csv(f"result_llava_next_{args.data_path}.csv", index=False)
 
 
 if __name__ == "__main__":

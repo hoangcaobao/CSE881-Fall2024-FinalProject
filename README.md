@@ -35,7 +35,7 @@ Here we provide several demos of results in the project report.
 + Train on both: ```python train.py --model VGG --train all```
 
 ### 3. Inference CLIP:
-```python inference_CLIP.py --cuda 0 --train_set all```
+```python inference_CLIP.py --cuda 0 --train_set all``` to generate csv results, then run ```python check_acc.py --result_path CLIP_result.csv``` to check accuracy.
 
 ### 4. Train a classifier on CLIP's embedding:
 + Train on Google dataset: ```python train_CLIP_classifier.py --epoch 40 --train_set google``` 
@@ -43,12 +43,12 @@ Here we provide several demos of results in the project report.
 + Train on both: ```python train_CLIP_classifier.py --epoch 40 --train_set all``` 
 
 ### 5. Inference Llava:
-Run ```python inference_Llava.py --data_path metadata_test``` to generate csv results, then run ```python check_acc.py``` to check accuracy.
+Run ```python inference_Llava.py --data_path metadata_test``` to generate csv results, then run ```python check_acc.py --result_path result_llava_next_meta_test.csv``` to check accuracy.
 
 ### 6. Llava + BLIP:
 + Firstly, we need to generation caption: ```python generate_caption.py --data_path metadata_test```
 + Then, run: ```python inference_Llava.py --use_BLIP T --data_path metadata_test``` to generate csv results.
-+ Finally, run ```python check_acc.py``` to check accuracy.
++ Finally, run ```python check_acc.py  --result_path result_llava_next_meta_test.csv``` to check accuracy.
 
 ## Run app
 We can run the app by ```streamlit run app.py``` to run locally. We also host the app through this GitHub Repo: [https://github.com/hoangcaobao/StreamlitDeploy](https://github.com/hoangcaobao/StreamlitDeploy).

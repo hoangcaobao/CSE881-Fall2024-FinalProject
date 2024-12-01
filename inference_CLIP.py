@@ -49,7 +49,7 @@ def main(args):
         results.append([ids, label, pred])
 
     df = pd.DataFrame(results, columns=["img_id", "label", "predict"])
-    df.to_csv("CLIP.csv", index=False)
+    df.to_csv("CLIP_results.csv", index=False)
 
 
 if __name__ == "__main__":
