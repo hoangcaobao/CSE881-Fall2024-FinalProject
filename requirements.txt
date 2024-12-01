@@ -9,3 +9,6 @@ tqdm
 sentence-transformers
 datasets
 diffusers[torch]
+selenium
+streamlit
+beautifulsoup4
